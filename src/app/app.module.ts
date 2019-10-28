@@ -14,6 +14,9 @@ import {AppRoutingModule} from './app-routing.module';
 import {WelcomeComponent} from './welcome/welcome.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {HeaderComponent} from './navigation/header/header.component';
+import {SidenavListComponent} from './navigation/sidenav-list/sidenav-list.component';
+import {StopTrainingDialogComponent} from './training/current-training/stop-training-dialog/stop-training-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +27,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     CurrentTrainingComponent,
     NewTrainingComponent,
     PastTrainingsComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    HeaderComponent,
+    SidenavListComponent,
+    StopTrainingDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +42,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     ReactiveFormsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    StopTrainingDialogComponent
+  ]
 })
 export class AppModule {
 }
