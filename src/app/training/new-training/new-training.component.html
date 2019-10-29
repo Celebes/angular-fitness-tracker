@@ -5,24 +5,24 @@
         Time to start a workout!
       </mat-card-title>
       <mat-card-content fxLayoutAlign="center">
-        <mat-form-field *ngIf="!isLoading && exercises">
+        <mat-form-field *ngIf="!(isLoading$ | async) && (exercises$ | async)">
           <mat-select placeholder="Choose Exercise" ngModel name="exercise" required>
-            <mat-option *ngFor="let exercise of exercises" [value]="exercise.id">
+            <mat-option *ngFor="let exercise of (exercises$ | async)" [value]="exercise.id">
               {{exercise.name}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-spinner *ngIf="isLoading"></mat-spinner>
+        <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
       </mat-card-content>
-      <mat-card-actions fxLayoutAlign="center" *ngIf="!isLoading">
-        <button *ngIf="exercises"
+      <mat-card-actions fxLayoutAlign="center" *ngIf="!(isLoading$ | async)">
+        <button *ngIf="(exercises$ | async).length"
                 mat-raised-button
                 color="primary"
                 type="submit"
                 [disabled]="f.invalid">
           Start
         </button>
-        <button *ngIf="!exercises"
+        <button *ngIf="!(exercises$ | async).length"
                 mat-raised-button
                 color="primary"
                 type="button"

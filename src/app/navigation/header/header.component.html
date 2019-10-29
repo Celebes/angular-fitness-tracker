@@ -7,11 +7,11 @@
   <div><a routerLink="/">FITNESS TRACKER</a></div>
   <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
     <ul fxLayout class="navigation-items" fxLayoutGap="10px">
-      <ng-container *ngIf="!isAuth">
+      <ng-container *ngIf="!(isAuthenticated$ | async)">
         <li><a routerLink="/signup">Signup</a></li>
         <li><a routerLink="/login">Login</a></li>
       </ng-container>
-      <ng-container *ngIf="isAuth">
+      <ng-container *ngIf="isAuthenticated$ | async">
         <li><a routerLink="/training">Training</a></li>
         <li><a class="clickable" (click)="onLogout()">Logout</a></li>
       </ng-container>
