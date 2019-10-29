@@ -4,6 +4,7 @@ import {Subject} from 'rxjs';
 import {Router} from '@angular/router';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {TrainingService} from '../training/training.service';
+import {UiService} from '../shared/ui.service';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
@@ -12,7 +13,8 @@ export class AuthService {
 
   constructor(private router: Router,
               private trainingService: TrainingService,
-              private angularFireAuth: AngularFireAuth) {
+              private angularFireAuth: AngularFireAuth,
+              private uiService: UiService) {
   }
 
   initAuthListener() {
@@ -31,22 +33,28 @@ export class AuthService {
   }
 
   registerUser(authData: AuthData) {
-    this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password)
-      .then(result => {
-        console.log(result);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    this.uiService.loadingStateChanged.next(true);
+    this.handleAuthResult(
+      this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password)
+    );
   }
 
   login(authData: AuthData) {
-    this.angularFireAuth.auth.signInWithEmailAndPassword(authData.email, authData.password)
+    this.uiService.loadingStateChanged.next(true);
+    this.handleAuthResult(
+      this.angularFireAuth.auth.signInWithEmailAndPassword(authData.email, authData.password)
+    );
+  }
+
+  private handleAuthResult(promise: Promise<firebase.auth.UserCredential>) {
+    promise
       .then(result => {
+        this.uiService.loadingStateChanged.next(false);
         console.log(result);
       })
       .catch(error => {
-        console.log(error);
+        this.uiService.loadingStateChanged.next(false);
+        this.uiService.showSnackbar(error.message);
       });
   }
 

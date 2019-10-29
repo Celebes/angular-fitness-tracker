@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Exercise} from './exercise.model';
 import {Subject, Subscription} from 'rxjs';
 import {AngularFirestore} from '@angular/fire/firestore';
+import {UiService} from '../shared/ui.service';
 
 @Injectable({providedIn: 'root'})
 export class TrainingService {
@@ -12,17 +13,25 @@ export class TrainingService {
   private currentExercise: Exercise;
   private firebaseSubscriptions: Subscription[] = [];
 
-  constructor(private db: AngularFirestore) {
+  constructor(private db: AngularFirestore,
+              private uiService: UiService) {
   }
 
   fetchAvailableExercises() {
+    this.uiService.loadingStateChanged.next(true);
     this.firebaseSubscriptions.push(
       this.db.collection<Exercise>('availableExercises').valueChanges({idField: 'id'})
+      /*.pipe(map(_ => {
+        throw new Error('No internet');
+      }))*/
         .subscribe((exercises: Exercise[]) => {
           this.availableExercises = exercises;
           this.exercisesChanged.next([...this.availableExercises]);
+          this.uiService.loadingStateChanged.next(false);
         }, error => {
-          console.log(error);
+          this.uiService.loadingStateChanged.next(false);
+          this.uiService.showSnackbar(`Fetching available exercises failed, please try again later (${error.message})`);
+          this.exercisesChanged.next(null);
         })
     );
   }
@@ -62,12 +71,19 @@ export class TrainingService {
   }
 
   fetchPastExercises() {
+    this.uiService.loadingStateChanged.next(true);
     this.firebaseSubscriptions.push(
       this.db.collection('finishedExercises').valueChanges()
+      /*.pipe(map(_ => {
+        throw new Error('No internet');
+      }))*/
         .subscribe((pastExercises: Exercise[]) => {
           this.pastExercisesChanged.next(pastExercises);
+          this.uiService.loadingStateChanged.next(false);
         }, error => {
-          console.log(error);
+          this.uiService.loadingStateChanged.next(false);
+          this.uiService.showSnackbar(`Fetching past exercises failed, please try again later (${error.message})`);
+          this.pastExercisesChanged.next(null);
         })
     );
   }

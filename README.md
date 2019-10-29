@@ -16,13 +16,13 @@ export const FIREBASE = {
 };
 ```
 
-Then reference it in your **environment.ts**:
+Then reference it in your **environment.ts** and **environment.prod.ts**:
 
 ```
 import {FIREBASE} from '../app/shared/firebase';
 
 export const environment = {
-  production: false,
+  production: ...,
   firebase: FIREBASE
 };
 ```

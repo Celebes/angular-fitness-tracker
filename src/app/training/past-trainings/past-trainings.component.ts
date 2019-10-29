@@ -3,6 +3,7 @@ import {TrainingService} from '../training.service';
 import {Exercise} from '../exercise.model';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {Subscription} from 'rxjs';
+import {UiService} from '../../shared/ui.service';
 
 @Component({
   selector: 'app-past-trainings',
@@ -21,20 +22,27 @@ export class PastTrainingsComponent implements OnInit, OnDestroy, AfterViewInit 
   ];
   dataSource = new MatTableDataSource<Exercise>();
   sub: Subscription;
+  isLoading: boolean;
+  uiSub: Subscription;
 
-  constructor(private trainingService: TrainingService) {
+  constructor(private trainingService: TrainingService,
+              private uiService: UiService) {
   }
 
   ngOnInit() {
+    this.uiSub = this.uiService.loadingStateChanged.subscribe(result => this.isLoading = result);
     this.sub = this.trainingService.pastExercisesChanged.subscribe((pastExercises: Exercise[]) => {
       this.dataSource.data = pastExercises;
     });
-    this.trainingService.fetchPastExercises();
+    this.fetchPastExercises();
   }
 
   ngOnDestroy() {
     if (this.sub) {
       this.sub.unsubscribe();
+    }
+    if (this.uiSub) {
+      this.uiSub.unsubscribe();
     }
   }
 
@@ -45,5 +53,9 @@ export class PastTrainingsComponent implements OnInit, OnDestroy, AfterViewInit 
 
   doFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  fetchPastExercises() {
+    this.trainingService.fetchPastExercises();
   }
 }
