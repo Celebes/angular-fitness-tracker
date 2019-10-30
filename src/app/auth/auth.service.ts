@@ -22,25 +22,25 @@ export class AuthService {
   initAuthListener() {
     this.angularFireAuth.authState.subscribe(user => {
       if (user) {
-        this.store.dispatch(new AuthActions.SetAuthenticated());
+        this.store.dispatch(AuthActions.setAuthenticated());
         this.router.navigate(['/training']);
       } else {
         this.trainingService.cancelSubscriptions();
-        this.store.dispatch(new AuthActions.SetUnauthenticated());
+        this.store.dispatch(AuthActions.setUnauthenticated());
         this.router.navigate(['/login']);
       }
     });
   }
 
   registerUser(authData: AuthData) {
-    this.store.dispatch(new UiActions.StartLoading());
+    this.store.dispatch(UiActions.startLoading());
     this.handleAuthResult(
       this.angularFireAuth.auth.createUserWithEmailAndPassword(authData.email, authData.password)
     );
   }
 
   login(authData: AuthData) {
-    this.store.dispatch(new UiActions.StartLoading());
+    this.store.dispatch(UiActions.startLoading());
     this.handleAuthResult(
       this.angularFireAuth.auth.signInWithEmailAndPassword(authData.email, authData.password)
     );
@@ -49,11 +49,11 @@ export class AuthService {
   private handleAuthResult(promise: Promise<firebase.auth.UserCredential>) {
     promise
       .then(result => {
-        this.store.dispatch(new UiActions.StopLoading());
+        this.store.dispatch(UiActions.stopLoading());
         console.log(result);
       })
       .catch(error => {
-        this.store.dispatch(new UiActions.StopLoading());
+        this.store.dispatch(UiActions.stopLoading());
         this.uiService.showSnackbar(error.message);
       });
   }

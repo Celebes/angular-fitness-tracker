@@ -19,28 +19,28 @@ export class TrainingService {
   }
 
   fetchAvailableExercises() {
-    this.store.dispatch(new UiActions.StartLoading());
+    this.store.dispatch(UiActions.startLoading());
     this.firebaseSubscriptions.push(
       this.db.collection<Exercise>('availableExercises').valueChanges({idField: 'id'})
       /*.pipe(map(_ => {
         throw new Error('No internet');
       }))*/
-        .subscribe((exercises: Exercise[]) => {
-          this.store.dispatch(new TrainingActions.SetAvailableExercises(exercises));
-          this.store.dispatch(new UiActions.StopLoading());
+        .subscribe((availableExercises: Exercise[]) => {
+          this.store.dispatch(TrainingActions.setAvailableExercises({availableExercises}));
+          this.store.dispatch(UiActions.stopLoading());
         }, error => {
-          this.store.dispatch(new UiActions.StopLoading());
+          this.store.dispatch(UiActions.stopLoading());
           this.uiService.showSnackbar(`Fetching available exercises failed, please try again later (${error.message})`);
-          this.store.dispatch(new TrainingActions.SetAvailableExercises([]));
+          this.store.dispatch(TrainingActions.setAvailableExercises({availableExercises: []}));
         })
     );
   }
 
-  startExercise(selectedId: string) {
-    this.db.doc<Exercise>(`availableExercises/${selectedId}`).update({
+  startExercise(selectedExerciseId: string) {
+    this.db.doc<Exercise>(`availableExercises/${selectedExerciseId}`).update({
       lastSelectedDate: new Date()
     });
-    this.store.dispatch(new TrainingActions.StartTraining(selectedId));
+    this.store.dispatch(TrainingActions.startTraining({selectedExerciseId}));
   }
 
   completeExercise() {
@@ -52,7 +52,7 @@ export class TrainingService {
           date: new Date(),
           state: 'completed'
         });
-        this.store.dispatch(new TrainingActions.StopTraining());
+        this.store.dispatch(TrainingActions.stopTraining());
       });
   }
 
@@ -67,24 +67,24 @@ export class TrainingService {
           date: new Date(),
           state: 'cancelled'
         });
-        this.store.dispatch(new TrainingActions.StopTraining());
+        this.store.dispatch(TrainingActions.stopTraining());
       });
   }
 
   fetchPastExercises() {
-    this.store.dispatch(new UiActions.StartLoading());
+    this.store.dispatch(UiActions.startLoading());
     this.firebaseSubscriptions.push(
       this.db.collection('finishedExercises').valueChanges()
       /*.pipe(map(_ => {
         throw new Error('No internet');
       }))*/
         .subscribe((pastExercises: Exercise[]) => {
-          this.store.dispatch(new TrainingActions.SetPastExercises(pastExercises));
-          this.store.dispatch(new UiActions.StopLoading());
+          this.store.dispatch(TrainingActions.setPastExercises({pastExercises}));
+          this.store.dispatch(UiActions.stopLoading());
         }, error => {
-          this.store.dispatch(new UiActions.StopLoading());
+          this.store.dispatch(UiActions.stopLoading());
           this.uiService.showSnackbar(`Fetching past exercises failed, please try again later (${error.message})`);
-          this.store.dispatch(new TrainingActions.SetPastExercises([]));
+          this.store.dispatch(TrainingActions.setPastExercises({pastExercises: []}));
         })
     );
   }
